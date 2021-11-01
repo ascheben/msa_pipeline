@@ -1,0 +1,14 @@
+channels:
+ - bioconda
+ - conda-forge
+ - defaults
+dependencies:
+ - ucsc-fasize=377
+ - ucsc-fatotwobit=377
+ - ucsc-axtchain=377
+ - ucsc-chainPreNet=377
+ - ucsc-nettoaxt=377
+ - ucsc-axtsort=377
+ - ucsc-axttomaf=377
+ - ucsc-fatotwobit=377
+ - ucsc-chainnet=377

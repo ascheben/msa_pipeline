@@ -1,0 +1,11 @@
+channels:
+ - bioconda
+ - conda-forge
+ - defaults
+dependencies:
+ - last=1256
+ - gsalign=1.0.22
+ - parafly
+ - ucsc-fasize=377
+ - ucsc-fatotwobit=377
+ - ucsc-bamtopsl=377

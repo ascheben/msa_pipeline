@@ -1,0 +1,20 @@
+import os
+
+configfile: "config/config.yaml"
+
+rule all:
+    input:
+      'data/{refname}.fa'.format(refname=config['refName'])
+
+    params:
+      wd = os.getcwd()
+    message:
+     '''
+     This pipeline is meant to be run in increments.  Users can run their
+     aligning and chain/net commands (align.smk and chain_and_net.smk) for different species
+     on multiple machines if desired to speed processing, then pull the files together on a single
+     machine to run the roast command from roast.smk
+     '''
+include: "./rules/align.smk"
+include: "./rules/chain_and_net.smk"
+include: "./rules/roast.smk"

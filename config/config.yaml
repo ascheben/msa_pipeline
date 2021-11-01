@@ -1,0 +1,39 @@
+# Example config for msa_pipeline Snakefile
+
+# Reference species name
+# The name should match the name of the fasta file but NOT contain the .fa suffix
+refName: sp_1
+
+# Species to be aligned to reference
+# The species names should match the fasta file(s), 
+# but NOT contain the .fa suffix
+species:
+  - sp_2
+  - sp_3
+  - sp_4
+  - sp_5
+  - sp_6
+  - sp_7
+
+# Split input fasta files into n chunks for improved parallel processing
+# Chunks are aligned in parallel if sufficient threads are available
+splitFastaN: 1
+# Set alignment tool: last|minimap2|gsalign
+aligner: last
+# change default alignment parameters
+lastParams: "-m 10 -j 3 -u 1 -p HOXD70"
+minimap2Params: "-a -cx asm20"
+gsalignParams: "-sen -no_vcf"
+roastParams: "+ X=2 E="
+
+# Without last-split, the alignments are many-many after lastal, and many-one afer
+# chaining and netting.  
+lastSplit: ""
+# For one-to-one alignments, uncomment the lastSplit line below
+#lastSplit: " | last-split | maf-swap | last-split | maf-swap "
+ 
+# Optional newick format species tree for roast
+# It must contain the reference and all other species in the alignment
+# Example: "((sp_1,(sp_2,sp_3)),((sp_4,sp_5),(sp_6,sp_7)));"
+# If left empty, tree will be calculated from genome sequences with mashtree 
+speciesTree:
