@@ -39,7 +39,7 @@ rule make_tree:
     log:
       'logs/topology_log.txt'
     benchmark:
-      'logs/topology_bm.txt'
+      'benchmark/topology_bm.txt'
     conda:
       '../envs/mashtree.yaml'
     threads: 4

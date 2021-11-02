@@ -27,7 +27,7 @@ roastParams: "+ X=2 E="
 # Without last-split, the alignments are many-many after lastal, and many-one afer
 # chaining and netting.  
 lastSplit: ""
-# For one-to-one alignments, uncomment the lastSplit line below
+# For one-to-one alignments, comment the above and uncomment the lastSplit line below
 #lastSplit: " | last-split | maf-swap | last-split | maf-swap "
  
 # Optional species tree for roast

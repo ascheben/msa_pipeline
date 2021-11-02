@@ -8,11 +8,15 @@ available_mem_gb = lambda: '%dG' % (virtual_memory().available >> 30)
 
 SPECIES = config['species']
 
-#print(config["splitFastaN"])
+# split fasta index numbers
+splitN = config["splitFastaN"]
+padN = len(str(splitN))
+Nlist = list(range(0, splitN))
+padList = [str(item).zfill(padN) for item in Nlist]
+
 
 if config["splitFastaN"] > 1 and config["aligner"] == "last":
     ruleorder: last_align_split > last_align
-    
 else:
     ruleorder: last_align > last_align_split
 
@@ -31,7 +35,7 @@ rule lastdb_index:
       # file is actually created in the shell: directive with "touch"
       # This rule will also create the ref's 2bit file, which may be
       # used later in net_to_axt (but isn't used at the time of writing)
-      'results/genome/{refname}lastdb_index.done',
+      temp('results/genome/{refname}lastdb_index.done')
 
     params:
       aligner=config['aligner'],
@@ -46,7 +50,6 @@ rule lastdb_index:
       '../envs/last.yaml'
     shell:
       """ 
-      echo "Running indexing" && \
       faSize -detailed {input.fasta} > {params.refSizeFile}
       if [ {params.aligner} = "last" ];then
         lastdb -R 10 -u YASS -c {params.indexBase} {input.fasta}
@@ -87,19 +90,20 @@ rule build_index:
       """
       mkdir -p {params.refNibDir} && \
       faToTwoBit {params.refFastaFile} {params.refNib2Bit} && \
-      faSize -detailed {input.fastaFile} > {params.speciesSizeFile}
+      faSize -detailed {input.fastaFile} > {output}
       """
 
 rule split_fasta:
     input:
       str(rules.lastdb_index.output).format(refname=config['refName']),
       speciesSizeFile='results/genome/{species}.size',
-      fastaFile="data/{species}.fa" 
+      fastaFile='data/{species}.fa' 
     output:
-      splitDummy='results/genome/{species}_split/{species}.split'
+      splitFa=temp(expand('data/{{species}}.{index}.fa',index=padList)),
+      flat=temp('data/{species}.fa.flat'),
+      gdx=temp('data/{species}.fa.gdx'),
+      splitDummy=temp('data/{species}.split')
     params:
-      splitDir='results/genome/{species}_split',
-      speciesPrefix='data/{species}',
       splitFastaN=config['splitFastaN']
     log:
       'logs/{species}_fasplit_log.txt'
@@ -107,16 +111,13 @@ rule split_fasta:
       'benchmark/{species}-split_bm.txt'
     conda:
       '../envs/split.yaml'
-    #wildcard_constraints:
-    #  N='\d+'
     threads: 1
     shell:
       """
-      mkdir -p {params.splitDir} && \
-      pyfasta split -n {params.splitFastaN} {input.fastaFile} &>{log}&& \
-      mv {params.speciesPrefix}.[0-9]*.fa {params.splitDir} && \
+      pyfasta split -n {params.splitFastaN} {input.fastaFile} &>{log} && \
       touch {output.splitDummy}
       """
+
 
 rule last_align:
     input:
@@ -125,7 +126,6 @@ rule last_align:
       speciesSizeFile='results/genome/{species}.size',
     output:
       name='results/psl/{species}.psl'
-      #name='{genomedir}/psl/{species}.psl' if config['aligner'] == 'last' else '{genomedir}/psl/{species}.bam'
     params:
       indexBase='data/{refname}'.format(refname=config['refName']),
       refName=config['refName'],
@@ -157,11 +157,8 @@ rule last_align:
       # ref .2bit file
       """
       if [ {params.aligner} = "minimap2" ];then
-         echo "Running minimap2" && \
-         #minimap2 -a -cx asm20 {params.refFastaFile} {input.fastaFile} | samtools sort | bamToPsl /dev/stdin {output}
          minimap2 {params.minimap2Params} {params.refFastaFile} {input.fastaFile} 2>>{log} | samtools sort | bamToPsl /dev/stdin {output.name} &>>{log}
       elif [ {params.aligner} = "last" ];then
-         echo "Running lastal" && \
          lastal {params.lastParams} {params.indexBase} {input.fastaFile} {params.lastSplitParams} | maf-convert psl /dev/stdin 2>{log} 1>{output.name}
       elif [ {params.aligner} = "gsalign" ];then
          GSAlign {params.gsalignParams} -r {params.refFastaFile} -q {input.fastaFile} -o {params.speciesPath} -i {params.indexBase} &>>{log} && sed -i "s/^s qry\./s /" {params.speciesPath}.maf && sed -i "s/^s ref\./s /" {params.speciesPath}.maf && maf-convert psl {params.speciesPath}.maf 2>>{log} 1>{output.name}
@@ -170,35 +167,34 @@ rule last_align:
 
 rule last_align_split:
     input:
-      splitDummy='results/genome/{species}_split/{species}.split'
+      splitFa=expand("data/{{species}}.{index}.fa",index=padList),
+      splitDummy='data/{species}.split'
     output:
-      'results/psl/{species}.psl'
+      psl='results/psl/{species}.psl',
+      cmd=temp('results/genome/{species}.cmd'),
+      cmdcomp=temp('results/genome/{species}.cmd.completed'),
+      splitMaf=temp(expand('results/genome/{{species}}.{index}.maf',index=padList))
     params:
       indexBase='data/{refname}'.format(refname=config['refName']),
       refName=config['refName'],
-      splitDir='results/genome/{species}_split',
+      splitDir='results/genome/',
       speciesPath='results/genome/{species}',
       lastParams=config['lastParams'],
       lastSplitParams=config['lastSplit'],
+      splitFa=expand('data/{{species}}.{index}.fa',index=padList)
     log:
       'logs/{species}_lastAlign_split_log.txt'
     benchmark:
-      'benchmark/{species}-lastAlign_split_bm.txt'
+      'benchmark/{species}_lastAlign_split_bm.txt'
     conda:
       '../envs/last.yaml'
     threads: config["splitFastaN"]
     shell:
-      # This shell will kick off for each fasta in the {genomedir}/fastas folder.  Each instance
-      # of this rule gets 1 thread, but multiple lastal commands may be run, depending on the number of species
-      # and the number of threads given on the command line.
-      # NOTE: more threads means more memory used, and you could run out, so have to
-      # temper the number of threads.
-      # the file size from faSize is needed is the chain/net steps later as is the
-      # ref .2bit file
-      #
+      # This script will align split fasta files to the reference using parafly parallelization
+      # It uses some potentially unsafe globbing and rm
+      # These should be replaced with expand() inputs by eliminating 0 padding from split fasta names
       """
-      echo "Running lastal on split files" && \
-      ls {params.splitDir}/*fa| while read l; do echo "lastal {params.lastParams} {params.indexBase} $l {params.lastSplitParams} | maf-convert psl /dev/stdin| gzip > $l.psl.gz";done > {params.splitDir}/lastal.cmd && \
-      ParaFly -c {params.splitDir}/lastal.cmd -CPU {threads} &>>{log} && \
-      zcat {params.splitDir}/*.psl.gz | awk '$9!="++"' > {output} 
+      ls {params.splitFa}| sed 's@.*/@@'| while read l; do echo "lastal {params.lastParams} {params.indexBase} data/$l > {params.splitDir}${{l%%.fa}}.maf";done > {params.speciesPath}.cmd && \
+      ParaFly -c {params.speciesPath}.cmd -CPU {threads} &>>{log} && \
+      cat {output.splitMaf} | sed '30,${{/^#/d;}}' | maf-sort /dev/stdin {params.lastSplitParams} | maf-convert psl /dev/stdin |awk '$9!="++"' > {output.psl}
       """

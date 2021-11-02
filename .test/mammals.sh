@@ -14,12 +14,27 @@ elif [ "$CURL" == "1" ]; then
   PARAM="-o"
 fi
 
+if [ -n "$1" ];then
+  if [ -d "$1" ]; then
+    OUTDIR="$1"
+    echo "Writing to $OUTDIR"
+  else
+    echo "Provided output directory is invalid. Writing to $PWD" 
+    OUTDIR="."
+  fi
+else
+  OUTDIR="."
+  echo "Writing to $PWD"
+fi
+
+sleep 5s
+
 if [ -z "$TOOL" ]; then
   echo "Please install wget or curl."
 else
-  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simCow.chr6 $PARAM simCow.fa; sed -i '/^>/s/.*chr/>chr/' simCow.fa 
-  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simDog.chr6 $PARAM simDog.fa; sed -i '/^>/s/.*chr/>chr/' simDog.fa
-  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simHuman.chr6 $PARAM simHuman.fa; sed -i '/^>/s/.*chr/>chr/' simHuman.fa
-  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simMouse.chr6 $PARAM simMouse.fa; sed -i '/^>/s/.*chr/>chr/' simMouse.fa
-  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simRat.chr6 $PARAM simRat.fa; sed -i '/^>/s/.*chr/>chr/' simRat.fa
+  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simCow.chr6 $PARAM $OUTDIR/simCow.fa ; sed -i '/^>/s/.*chr/>chr/' $OUTDIR/simCow.fa 
+  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simDog.chr6 $PARAM $OUTDIR/simDog.fa ; sed -i '/^>/s/.*chr/>chr/' $OUTDIR/simDog.fa
+  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simHuman.chr6 $PARAM $OUTDIR/simHuman.fa ; sed -i '/^>/s/.*chr/>chr/' $OUTDIR/simHuman.fa
+  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simMouse.chr6 $PARAM $OUTDIR/simMouse.fa ; sed -i '/^>/s/.*chr/>chr/' $OUTDIR/simMouse.fa
+  $TOOL https://raw.githubusercontent.com/UCSantaCruzComputationalGenomicsLab/cactusTestData/master/evolver/mammals/loci1/simRat.chr6 $PARAM $OUTDIR/simRat.fa ; sed -i '/^>/s/.*chr/>chr/' $OUTDIR/simRat.fa
 fi
