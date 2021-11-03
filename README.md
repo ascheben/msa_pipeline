@@ -64,4 +64,23 @@ This repository is under development and is based on our previous repository [ms
    
 Python 3, conda and snakemake. See [snakemake installation guide](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
 
+### Patching netToAxt for large, fragmented alignments
+
+For diverged large plant genomes, it is common that large numbers of alignment chains are produced, which can lead to to `netToAxt` error: `chainId 273107809, can only handle up to 268435456`. Currently the only way to address this issue is to patch and recompile the utility and then to hardcode the path into the relevant snakemake rule net_to_axt_to_maf which can be found in `workflow/rules/chain_and_net.smk`. The script below shoud compile a patched netToAxt in `$(pwd)/bin`. 
+
+```
+wget http://hgdownload.cse.ucsc.edu/admin/exe/userApps.archive/userApps.v421.src.tgz
+tar -xvzf userApps.v421.src.tgz
+export MACHTYPE=x86_64
+export BINDIR=$(pwd)/bin
+export L="${LDFLAGS}"
+mkdir -p "$BINDIR"
+(cd userApps/kent/src/lib && make)
+(cd userApps/kent/src/htslib && make)
+(cd userApps/kent/src/jkOwnLib && make)
+(cd userApps/kent/src/hg/lib && make)
+(cd userApps/kent/src/hg/mouseStuff/netToAxt &&  sed -i 's/maxChainId (256\*1024\*1024)/maxChainId (256\*1024\*1024\*6)/' netToAxt.c && make)
+chmod +x $BINDIR/netToAxt
+```
+
 
