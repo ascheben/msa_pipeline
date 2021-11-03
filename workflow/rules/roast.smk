@@ -89,7 +89,7 @@ rule run_roast:
     benchmark:
       'benchmark/roast_bm.txt'
     log:
-      '../../logs/roast.log'
+      'roast.log'
     conda:
       '../envs/roast.yaml'
     threads: 1
@@ -98,5 +98,5 @@ rule run_roast:
       roast_tree=`cat {input.tree}` #&& \ 
       mkdir -p {params.outputDir} && \
       cd {params.inputDir} && \
-      roast {params.roastPs}{params.roastRef} "$roast_tree" {input.toasts} ../roast/roast.maf &>{log}
+      roast {params.roastPs}{params.roastRef} "$roast_tree" {input.toasts} ../roast/roast.maf &>../../logs/{log}
       """
