@@ -15,8 +15,9 @@ species:
   - sp_6
   - sp_7
 
-# Split input fasta files into n chunks for improved parallel processing
+# Split input fasta files into N chunks for improved parallel processing
 # Chunks are aligned in parallel if sufficient threads are available
+# Setting N to be greater than the minimum chromosome/scaffold number may lead to errors
 splitFastaN: 1
 # Set alignment tool: last|minimap2|gsalign
 aligner: last
