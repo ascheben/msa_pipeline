@@ -5,7 +5,7 @@
 refName: sp_1
 
 # Species to be aligned to reference
-# The species names should match the fasta file(s), 
+# The species names should match the fasta file(s) located in "msa_pipeline/data", 
 # but NOT contain the .fa suffix
 species:
   - sp_2
