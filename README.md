@@ -26,6 +26,7 @@ To test the pipeline before running on your own data, you can align some simulat
 
 ```
 cd msa_pipeline
+mkdir data
 # download test mammalian fasta files (3Mb total) to the data directory
 bash .test/mammals.sh ./data
 # align sequences to reference and carry out chaining and netting
@@ -39,7 +40,6 @@ The main multiple sequence alignment result is written to `./results/roast/roast
 A larger set of whole plant genomes can also be used to test the pipeline and the parallelization efficiency. Set the number of threads with the `-j` flag; using 12 threads should allow the pipeline to run in <1h.
 
 ```
-cd msa_pipeline
 # download test Arabidopsis fasta files (700Mb total) to the data directory
 bash .test/arabidopsis.sh ./data
 # split fasta files and align to reference, then carry out chaining and netting
