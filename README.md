@@ -62,6 +62,6 @@ This repository is under development and is based on our previous repository [ms
 
 ### Requirements
    
-Python 3 and snakemake. See [snakemake installation guide](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
+Python 3, conda and snakemake. See [snakemake installation guide](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
 
 
