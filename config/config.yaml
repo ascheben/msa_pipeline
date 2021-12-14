@@ -38,3 +38,7 @@ lastSplit: ""
 # Example: "((sp_1,(sp_2,sp_3)),((sp_4,sp_5),(sp_6,sp_7)));"
 # If left empty, tree will be calculated from genome sequences with mashtree 
 speciesTree:
+
+maxNeutralSites: 10000000
+# A GFF file must be provided in the /data dir to use a neutral model based on 4-fold degenerate sites
+refGFF:

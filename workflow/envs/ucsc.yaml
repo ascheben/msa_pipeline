@@ -12,3 +12,5 @@ dependencies:
  - ucsc-axttomaf=377
  - ucsc-fatotwobit=377
  - ucsc-chainnet=377
+ - ucsc-mafsplit=377
+ - ucsc-mafsinregion=377

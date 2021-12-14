@@ -3,6 +3,5 @@ channels:
  - conda-forge
  - defaults
 dependencies:
- - phast=1.5
- - raxml=8.2.4
- - gerp=2.1
+ - bedtools=2.30.0
+ - bedops=2.4.39
