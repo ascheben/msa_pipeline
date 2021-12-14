@@ -18,3 +18,4 @@ rule all:
 include: "./rules/align.smk"
 include: "./rules/chain_and_net.smk"
 include: "./rules/roast.smk"
+include: "./rules/call_conservation.smk"
