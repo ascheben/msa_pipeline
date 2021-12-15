@@ -62,7 +62,13 @@ This repository is under development and is based on our previous repository [ms
 
 ### Requirements
    
-Python 3, conda and snakemake. See [snakemake installation guide](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
+Snakemake is required to run this pipeline. The recommended installation is shown below. For more details see [snakemake installation guide](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
+
+```
+conda install -n base -c conda-forge mamba
+conda activate base
+mamba create -c conda-forge -c bioconda -n snakemake snakemake
+```
 
 ### Patching netToAxt for large, fragmented alignments
 

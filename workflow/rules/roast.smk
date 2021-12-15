@@ -52,7 +52,7 @@ rule clean_tree:
     input:
       top='results/tree/topology.nwk'
     output:
-       temp(mtree='results/tree/topology_clean.txt')
+       mtree=temp('results/tree/topology_clean.txt')
     log:
       'logs/topology_clean_log.txt'
     benchmark:
