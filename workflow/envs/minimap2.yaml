@@ -1,8 +1,0 @@
-channels:
- - bioconda
- - conda-forge
- - defaults
-dependencies:
- - minimap2=2.22
- - samtools=1.13
- - ucsc-bamtopsl=377
