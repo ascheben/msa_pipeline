@@ -50,13 +50,13 @@ rule lastdb_index:
       '../envs/last.yaml'
     shell:
       """ 
-      faSize -detailed {input.fasta} > {params.refSizeFile}
+      faSize -detailed {input.fasta} > {params.refSizeFile} 2>{log}
       if [ {params.aligner} = "last" ];then
-        lastdb -R 10 -u YASS -c {params.indexBase} {input.fasta}
+        lastdb -R 10 -u YASS -c {params.indexBase} {input.fasta} &>>{log}
       elif [ {params.aligner} = "gsalign" ];then
-        GSAlign index {input.fasta} {params.indexBase}
+        GSAlign index {input.fasta} {params.indexBase} &>>{log}
       fi
-      touch {output}
+      touch {output} &>>{log}
       """
 
 rule build_index:
@@ -157,7 +157,7 @@ rule last_align:
       # ref .2bit file
       """
       if [ {params.aligner} = "minimap2" ];then
-         minimap2 {params.minimap2Params} {params.refFastaFile} {input.fastaFile} 2>>{log} | samtools sort | bamToPsl /dev/stdin {output.name} &>>{log}
+         minimap2 {params.minimap2Params} {params.refFastaFile} {input.fastaFile} 2>>{log} | samtools sort 2>>{log} | bamToPsl /dev/stdin {output.name} &>>{log}
       elif [ {params.aligner} = "last" ];then
          lastal {params.lastParams} {params.indexBase} {input.fastaFile} {params.lastSplitParams} | maf-convert psl /dev/stdin 2>{log} 1>{output.name}
       elif [ {params.aligner} = "gsalign" ];then
@@ -168,7 +168,8 @@ rule last_align:
 rule last_align_split:
     input:
       splitFa=expand("data/{{species}}.{index}.fa",index=padList),
-      splitDummy='data/{species}.split'
+      splitDummy='data/{species}.split',
+      speciesSizeFile='results/genome/{species}.size'
     output:
       psl='results/psl/{species}.psl',
       cmd=temp('results/genome/{species}.cmd'),
