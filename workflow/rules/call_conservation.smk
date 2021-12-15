@@ -11,8 +11,8 @@ TREE = config['speciesTree']
 
 rule call_conservation:
     input:
-       'results/conservation2/gerp.complete',
-       'results/conservation2/phylop.complete'
+       'results/conservation/gerp.complete',
+       'results/conservation/phylop.complete'
 
 rule cds_fold:
     input:
@@ -166,7 +166,7 @@ checkpoint rule maf_split:
        maf='results/roast/roast.maf',
        tree='results/tree/neutral.tre'
     output:
-       dir=directory('results/conservation')
+       dir=directory('results/conservation_raw')
     log:
       'logs/mafsplit_log.txt'
     benchmark:
@@ -182,9 +182,9 @@ checkpoint rule maf_split:
 
 rule gerp:
     input:
-       maf='results/conservation/{chr}.maf'
+       maf='results/conservation_raw/{chr}.maf'
     output:
-       temp=('results/conservation/{chr}.maf.rates')
+       temp=('results/conservation_raw/{chr}.maf.rates')
     params:
        refname=config['refName'],
        neutral='results/tree/neutral.tre'
@@ -200,9 +200,9 @@ rule gerp:
 
 rule phylop:
     input:
-       maf='results/conservation/{chr}.maf'
+       maf='results/conservation_raw/{chr}.maf'
     output:
-       temp=('results/conservation/{chr}.phylop.wig')
+       temp=('results/conservation_raw/{chr}.phylop.wig')
     params:
        neutral='results/tree/neutral.mod'
     log:
@@ -217,9 +217,9 @@ rule phylop:
 
 rule wig2bed:
     input:
-       'results/conservation/{chr}.phylop.wig'
+       'results/conservation_raw/{chr}.phylop.wig'
     output:
-       temp=('results/conservation/{chr}.phylop.bed')
+       temp=('results/conservation_raw/{chr}.phylop.bed')
     conda:
       '../envs/bedtools.yaml'
     threads: 1
@@ -230,7 +230,7 @@ rule wig2bed:
 
 rule add_phylop_header:
     input:
-       'results/conservation/{chr}.phylop.bed'
+       'results/conservation_raw/{chr}.phylop.bed'
     output:
        'results/phylop/{chr}.phylop.final.bed'
     threads: 1
@@ -241,9 +241,9 @@ rule add_phylop_header:
 
 rule gerp2bed:
     input:
-       'results/conservation/{chr}.maf.rates'
+       'results/conservation_raw/{chr}.maf.rates'
     output:
-       temp('results/conservation/{chr}.maf.rates.bed')
+       temp('results/conservation_raw/{chr}.maf.rates.bed')
     conda:
       '../envs/phast.yaml'
     threads: 1
@@ -256,9 +256,9 @@ rule gerp2bed:
 
 rule maf2cov:
     input:
-       'results/conservation/{chr}.maf'
+       'results/conservation_raw/{chr}.maf'
     output:
-       temp('results/conservation/{chr}.maf.cov.bed')
+       temp('results/conservation_raw/{chr}.maf.cov.bed')
     conda:
       '../envs/biopython.yaml'
     threads: 1
@@ -267,10 +267,10 @@ rule maf2cov:
 
 rule add_cov:
     input:
-       cov='results/conservation/{chr}.maf.cov.bed',
-       rates='results/conservation/{chr}.maf.rates.bed'
+       cov='results/conservation_raw/{chr}.maf.cov.bed',
+       rates='results/conservation_raw/{chr}.maf.rates.bed'
     output:
-       temp('results/conservation/{chr}.rates.cov.bed')
+       temp('results/conservation_raw/{chr}.rates.cov.bed')
     conda:
       '../envs/bedtools.yaml'
     threads: 1
@@ -281,7 +281,7 @@ rule add_cov:
 
 rule add_gerp_header:
     input:
-      'results/conservation/{chr}.rates.cov.bed' 
+      'results/conservation_raw/{chr}.rates.cov.bed' 
     output:
        'results/gerp/{chr}.rates.cov.final.bed'
     conda:
@@ -306,7 +306,7 @@ rule gerp_clean:
     input:
        gerp_aggregate
     output:
-       temp('results/conservation2/gerp.complete')
+       temp('results/conservation/gerp.complete')
     conda:
       '../envs/phast.yaml'
     threads: 1
@@ -319,7 +319,7 @@ rule phylop_clean:
     input:
        phylop_aggregate
     output:
-       temp('results/conservation2/phylop.complete')
+       temp('results/conservation/phylop.complete')
     conda:
       '../envs/phast.yaml'
     threads: 1
