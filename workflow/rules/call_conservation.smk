@@ -4,6 +4,7 @@ from snakemake import available_cpu_count
 from psutil import virtual_memory
 
 available_mem_gb = lambda: '%dG' % (virtual_memory().available >> 30)
+containerized: "docker://lynnjo/msa_pipeline:1.0.1"
 
 SPECIES = config['species']
 TREE = config['speciesTree']
@@ -231,7 +232,7 @@ rule add_phylop_header:
     input:
        'results/conservation/{chr}.phylop.bed'
     output:
-       temp('results/phylop/{chr}.phylop.final.bed')
+       'results/phylop/{chr}.phylop.final.bed'
     threads: 1
     shell:
       """

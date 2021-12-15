@@ -5,6 +5,7 @@ from psutil import virtual_memory
 # editing the "alignParams" parameter.
 
 available_mem_gb = lambda: '%dG' % (virtual_memory().available >> 30)
+containerized: "docker://lynnjo/msa_pipeline:1.0.1"
 
 SPECIES = config['species']
 
