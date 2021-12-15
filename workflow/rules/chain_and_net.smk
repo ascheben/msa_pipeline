@@ -8,7 +8,7 @@ available_mem_gb = lambda: '%dG' % (virtual_memory().available >> 30)
 
 SPECIES = config['species']
 
-rule align:
+rule toast:
     input:
       # the wildcards in chains will also handle definition of wildcards for fastas
       roastMafs=expand("results/toast/{refname}.{species}.toast2.maf",species=SPECIES,refname=config['refName'])

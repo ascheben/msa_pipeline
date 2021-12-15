@@ -16,12 +16,12 @@ padList = [str(item).zfill(padN) for item in Nlist]
 
 
 if config["splitFastaN"] > 1 and config["aligner"] == "last":
-    ruleorder: last_align_split > last_align
+    ruleorder: align_split > align
 else:
-    ruleorder: last_align > last_align_split
+    ruleorder: align > align_split
 
 # This is the final output, and the rule to call to run all rules in this file
-rule last_all:
+rule align_all:
     input:
       # the wildcards in psls will also handle definition of wildcards for fastas
       psls=expand("results/psl/{species}.psl",species=SPECIES)
@@ -47,7 +47,7 @@ rule lastdb_index:
     benchmark:
       'benchmark/{refname}-lastdb.txt'
     conda:
-      '../envs/last.yaml'
+      '../envs/align.yaml'
     shell:
       """ 
       faSize -detailed {input.fasta} > {params.refSizeFile} 2>{log}
@@ -119,7 +119,7 @@ rule split_fasta:
       """
 
 
-rule last_align:
+rule align:
     input:
       str(rules.lastdb_index.output).format(refname=config['refName']),
       fastaFile="data/{species}.fa",
@@ -145,7 +145,7 @@ rule last_align:
     benchmark:
       'benchmark/{species}-align_bm.txt'
     conda:
-      '../envs/minimap2.yaml' if config['aligner'] == 'minimap2' else '../envs/last.yaml'
+      '../envs/align.yaml'
     threads: 1
     shell:
       # This shell will kick off for each fasta in the {genomedir}/fastas folder.  Each instance
@@ -165,7 +165,7 @@ rule last_align:
       fi
       """
 
-rule last_align_split:
+rule align_split:
     input:
       splitFa=expand("data/{{species}}.{index}.fa",index=padList),
       splitDummy='data/{species}.split',
@@ -188,7 +188,7 @@ rule last_align_split:
     benchmark:
       'benchmark/{species}_lastAlign_split_bm.txt'
     conda:
-      '../envs/last.yaml'
+      '../envs/align.yaml'
     threads: config["splitFastaN"]
     shell:
       # This script will align split fasta files to the reference using parafly parallelization
