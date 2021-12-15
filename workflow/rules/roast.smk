@@ -6,7 +6,7 @@ from snakemake import available_cpu_count
 from psutil import virtual_memory
 
 available_mem_gb = lambda: '%dG' % (virtual_memory().available >> 30)
-containerized: "docker://lynnjo/msa_pipeline:1.0.1"
+containerized: "docker://apscheben/msa_pipeline:latest"
 
 SPECIES = config['species']
 TREE = config['speciesTree']

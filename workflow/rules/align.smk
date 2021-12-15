@@ -5,7 +5,7 @@ from psutil import virtual_memory
 # editing the "alignParams" parameter.
 
 available_mem_gb = lambda: '%dG' % (virtual_memory().available >> 30)
-containerized: "docker://lynnjo/msa_pipeline:1.0.1"
+containerized: "docker://apscheben/msa_pipeline:latest"
 
 SPECIES = config['species']
 
@@ -14,6 +14,12 @@ splitN = config["splitFastaN"]
 padN = len(str(splitN))
 Nlist = list(range(0, splitN))
 padList = [str(item).zfill(padN) for item in Nlist]
+
+# Prevent evaluation of lastParams as None
+if not config["lastParams"]:
+    LAST_PARAMS = ""
+else:
+    LAST_PARAMS = config["lastParams"]
 
 
 if config["splitFastaN"] > 1 and config["aligner"] == "last":
@@ -133,7 +139,7 @@ rule align_single:
       species='{species}',
       speciesPath='results/genome/{species}',
       speciesSizeFile='results/genome/{species}.size',
-      lastParams=config['lastParams'],
+      lastParams=LAST_PARAMS,
       minimap2Params=config['minimap2Params'],
       gsalignParams=config['gsalignParams'],
       aligner=config['aligner'],
@@ -181,7 +187,7 @@ rule align_split:
       refName=config['refName'],
       splitDir='results/genome/',
       speciesPath='results/genome/{species}',
-      lastParams=config['lastParams'],
+      lastParams=LAST_PARAMS,
       lastSplitParams=config['lastSplit'],
       splitFa=expand('data/{{species}}.{index}.fa',index=padList)
     log:
