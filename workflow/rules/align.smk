@@ -119,7 +119,7 @@ rule split_fasta:
       """
 
 
-rule align:
+rule align_single:
     input:
       str(rules.lastdb_index.output).format(refname=config['refName']),
       fastaFile="data/{species}.fa",

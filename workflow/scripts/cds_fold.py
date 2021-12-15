@@ -145,7 +145,11 @@ def run_main(in_reference,in_gff,in_outfile,in_start_check,in_complete_check,sna
                 start = int(start)
                 end = int(end)
                 if s_type == "CDS":
-                    name = attr.split("ID=")[1].split(";")[0]
+                    try:
+                        name = attr.split("ID=")[1].split(";")[0]
+                    # non-standard GFF inputs will not follow specifications above
+                    except:
+                        name = attr
                     if old_name == "": old_name = name
                     if old_strand == "": old_strand = strand
                     if old_seqid == "" : old_seqid = seqid
