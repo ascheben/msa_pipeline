@@ -16,9 +16,9 @@ padList = [str(item).zfill(padN) for item in Nlist]
 
 
 if config["splitFastaN"] > 1 and config["aligner"] == "last":
-    ruleorder: align_split > align
+    ruleorder: align_split > align_single
 else:
-    ruleorder: align > align_split
+    ruleorder: align_single > align_split
 
 # This is the final output, and the rule to call to run all rules in this file
 rule align_all:
