@@ -294,13 +294,11 @@ rule add_gerp_header:
 
 def gerp_aggregate(wildcards):
     checkpoint_output = checkpoints.maf_split.get(**wildcards).output[0]
-    print(expand("results/gerp/{chr}.rates.cov.final.bed",chr=glob_wildcards(os.path.join(checkpoint_output, "{chr}.maf")).chr))
     return expand("results/gerp/{chr}.rates.cov.final.bed",
            chr=glob_wildcards(os.path.join(checkpoint_output, "{chr}.maf")).chr)
 
 def phylop_aggregate(wildcards):
     checkpoint_output = checkpoints.maf_split.get(**wildcards).output[0]
-    print(expand("results/phylop/{chr}.phylop.final.bed",chr=glob_wildcards(os.path.join(checkpoint_output, "{chr}.maf")).chr))
     return expand("results/phylop/{chr}.phylop.final.bed",
            chr=glob_wildcards(os.path.join(checkpoint_output, "{chr}.maf")).chr)
 
