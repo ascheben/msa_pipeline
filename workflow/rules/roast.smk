@@ -6,6 +6,7 @@ from snakemake import available_cpu_count
 from psutil import virtual_memory
 
 available_mem_gb = lambda: '%dG' % (virtual_memory().available >> 30)
+containerized: "docker://lynnjo/msa_pipeline:1.0.1"
 
 SPECIES = config['species']
 TREE = config['speciesTree']
@@ -18,7 +19,6 @@ else:
 rule roast:
     input:
       roastMerge='results/roast/roast.maf'
-
 
 rule write_tree:
     output:
@@ -52,7 +52,7 @@ rule clean_tree:
     input:
       top='results/tree/topology.nwk'
     output:
-       mtree='results/tree/topology_clean.txt'
+       temp(mtree='results/tree/topology_clean.txt')
     log:
       'logs/topology_clean_log.txt'
     benchmark:
@@ -69,23 +69,15 @@ rule run_roast:
     #Create merged, multi-aligned MAF file from axtToMaf output
     input:
       mafs=rules.align.input,
-      #toasts=expand('{refname}.{species}.toast2.maf',species=SPECIES,refname=config['refName']),
       toasts=expand('results/toast/{refname}.{species}.toast2.maf',species=SPECIES,refname=config['refName']),
       tree='results/tree/topology_clean.txt'
-      #tree=config["speciesTree"] if config["speciesTree"] else 'results/tree/topology_clean.txt'
     output:
       'results/roast/roast.maf'
-      #'results/roast/roast.maf'
     params:
-      #toasts=expand('{refname}.{species}.toast2.maf',species=SPECIES,refname=config['refName']),
-      #tree = TREE,
       inputDir='results/toast',
-      # these should be in the config file
       roastPs=config["roastParams"],
-      #roastMafFiles='*.toast2.maf',
       roastRef=config['refName'],
       outputDir='results/roast',
-      #outputFile='{genomedir}/roastOutput/roast.output.X2.maf'
     benchmark:
       'benchmark/roast_bm.txt'
     log:
@@ -95,7 +87,7 @@ rule run_roast:
     threads: 1
     shell:
       """
-      roast_tree=`cat {input.tree}` #&& \ 
+      roast_tree=`cat {input.tree}` 
       mkdir -p {params.outputDir} && \
       cd {params.inputDir} && \
       roast {params.roastPs}{params.roastRef} "$roast_tree" {input.toasts} ../roast/roast.maf &>../../logs/{log}
