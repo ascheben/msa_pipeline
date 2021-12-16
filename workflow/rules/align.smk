@@ -20,8 +20,24 @@ if not config["lastParams"]:
     LAST_PARAMS = ""
 else:
     LAST_PARAMS = config["lastParams"]
+if not config["lastSplit"]:
+    config["lastSplit"] = ""
+# Only allow split aligments with last aligner
+if not config["splitFastaN"]:
+    config["splitFastaN"] = 1
+elif config["splitFastaN"] > 1 and config["aligner"] != "last":
+    config["aligner"] = "last"
+# Set empty params to default values
+if not config["lastParams"]:
+    config["lastParams"] =  "-m 10 -j 3 -u 1 -p HOXD70"
+if not config["minimap2Params"]:
+    config["minimap2Params"] = "-a -cx asm20"
+if not config["gsalignParams"]:
+    config["gsalignParams"] = "-sen -no_vcf"
+if not config["roastParams"]:
+    config["roastParams"] = "+ X=2 E="
 
-
+# Ensure split alignment rule is prioritised when needed
 if config["splitFastaN"] > 1 and config["aligner"] == "last":
     ruleorder: align_split > align_single
 else:

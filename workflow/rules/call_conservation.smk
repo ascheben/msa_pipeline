@@ -230,13 +230,13 @@ rule wig2bed:
 
 rule add_phylop_header:
     input:
-       'results/conservation_raw/{chr}.phylop.cov.bed'
+       'results/conservation_raw/{chr}.phylop.bed'
     output:
        'results/phylop/{chr}.phylop.final.bed'
     threads: 1
     shell:
       """
-      cat <(printf 'chr\tstart\tend\tphyloP_-log_pvalue\tTaxaAligned\n') {input} > {output}
+      cat <(printf 'chr\tstart\tend\tphyloP_-log_pvalue\n') {input} > {output}
       """
 
 rule gerp2bed:
@@ -277,19 +277,6 @@ rule add_cov:
     shell:
       """
       bedtools intersect -loj -a {input.cov} -b {input.rates} | awk -v OFS='\t' '{{print $5,$6,$7,$8,$9,$4}}' > {output} 
-      """
-rule add_cov_phylop:
-    input:
-       cov='results/conservation_raw/{chr}.maf.cov.bed',
-       bed='results/conservation_raw/{chr}.phylop.bed'
-    output:
-       temp('results/conservation_raw/{chr}.phylop.cov.bed')
-    conda:
-      '../envs/bedtools.yaml'
-    threads: 1
-    shell:
-      """
-      bedtools intersect -loj -a {input.cov} -b {input.bed} | awk -v OFS='\t' '{{print $5,$6,$7,$8,$4}}' > {output} 
       """
 
 rule add_gerp_header:

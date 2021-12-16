@@ -11,6 +11,9 @@ containerized: "docker://apscheben/msa_pipeline:latest"
 SPECIES = config['species']
 TREE = config['speciesTree']
 
+if not config["roastParams"]:
+    config["roastParams"] = "+ X=2 E="
+
 if config["speciesTree"]:
     ruleorder: write_tree > make_tree
 else:
