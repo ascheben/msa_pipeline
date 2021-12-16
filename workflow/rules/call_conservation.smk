@@ -296,7 +296,7 @@ rule add_gerp_header:
     input:
       'results/conservation_raw/{chr}.rates.cov.bed' 
     output:
-       'results/gerp/{chr}.rates.cov.final.bed'
+       'results/gerp/{chr}.gerp.final.bed'
     conda:
       '../envs/bedtools.yaml'
     threads: 1
@@ -307,7 +307,7 @@ rule add_gerp_header:
 
 def gerp_aggregate(wildcards):
     checkpoint_output = checkpoints.maf_split.get(**wildcards).output[0]
-    return expand("results/gerp/{chr}.rates.cov.final.bed",
+    return expand("results/gerp/{chr}.gerp.final.bed",
            chr=glob_wildcards(os.path.join(checkpoint_output, "{chr}.maf")).chr)
 
 def phylop_aggregate(wildcards):
