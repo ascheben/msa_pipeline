@@ -11,8 +11,8 @@ def translate(seq):
     if len(seq) % 3 != 0: 
         raise ValueError('input sequence not divisible by 3')
         
-    if False in [s in ["A", "T", "G", "C", "N"] for s in seq]:
-        raise ValueError(f'{seq} contains at least one non nucleotide or N character')
+    #if False in [s in ["A", "T", "G", "C", "N"] for s in seq]:
+    #    raise ValueError(f'{seq} contains at least one non nucleotide or N character')
         
     table = { 
         'ATA':'I', 'ATC':'I', 'ATT':'I', 'ATG':'M', 

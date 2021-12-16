@@ -1,36 +1,61 @@
-# Example config for msa_pipeline Snakefile
+##############################################
+# Example config for msa_pipeline Snakefile  #
+##############################################
+
+########################
+# REQUIRED PARAMETERS  #
+########################
 
 # Reference species name
-# The name should match the name of the fasta file but NOT contain the .fa suffix
+# The name should match the name of a fasta file in "msa_pipeline/data" but NOT contain the .fa suffix
 refName: S288C
 
-# Species to be aligned to reference
-# The species names should match the fasta file(s), 
-# but NOT contain the .fa suffix
+# Query species to be aligned to reference
+# The species names should each match a fasta file in "msa_pipeline/data" but NOT contain the .fa suffix
 species:
   - BY4742
   - ySR128
   - YJM993
 
-# Split input fasta files into n chunks for improved parallel processing
+######################################
+# OPTIONAL PARAMETERS  FOR ALIGNMENT #
+######################################
+
+# Split input fasta files into N chunks for improved parallel processing
 # Chunks are aligned in parallel if sufficient threads are available
-splitFastaN: 1
+# Setting N to be greater than the minimum chromosome/scaffold number may lead to errors
+splitFastaN: 2
+
 # Set alignment tool: last|minimap2|gsalign
 aligner: last
-# change default alignment parameters
+
+# Change default alignment parameters
 lastParams: "-m 10 -j 3 -u 1 -p HOXD70"
-minimap2Params: "-a -cx asm20"
-gsalignParams: "-sen -no_vcf"
-roastParams: "+ X=2 E="
+minimap2Params:
+gsalignParams:
 
 # Without last-split, the alignments are many-many after lastal, and many-one afer
 # chaining and netting.  
-lastSplit: ""
-# For one-to-one alignments, comment the above and uncomment the lastSplit line below
- 
-# Optional newick species tree for roast
+lastSplit:
+# For one-to-one last alignments, comment the above and uncomment the lastSplit line below
+#lastSplit: " | last-split | maf-swap | last-split | maf-swap "
+
+# Roast multiple alignment parameters
+roastParams: "+ X=2 E="
+
+# Newick format species tree for roast
 # It must contain the reference and all other species in the alignment
 # Example: "((sp_1,(sp_2,sp_3)),((sp_4,sp_5),(sp_6,sp_7)));"
-# If included, branch lengths will be ignored
 # If left empty, tree will be calculated from genome sequences with mashtree 
-speciesTree: 
+speciesTree:
+
+#################################################
+# OPTIONAL PARAMETERS FOR CONSERVATION ANALYSIS #
+#################################################
+
+# When callling conservation set the max number of sites to use to calculate the neutral model
+# Higher numbers may slow down the analysis without providing a better model
+maxNeutralSites: 10000000
+
+# A GFF file with CDS features must be provided in the /data dir to use a neutral model based on 4-fold degenerate sites
+refGFF:
