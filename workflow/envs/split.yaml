@@ -1,6 +1,7 @@
 channels:
+ - conda-forge       
  - bioconda
- - conda-forge
  - defaults
 dependencies:
  - pyfasta=0.5.2
+ - python=3.8
