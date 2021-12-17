@@ -11,8 +11,8 @@ TREE = config['speciesTree']
 
 rule call_conservation:
     input:
-       'results/conservation/gerp.complete',
-       'results/conservation/phylop.complete'
+       'results/tree/gerp.complete',
+       'results/tree/phylop.complete'
 
 rule cds_fold:
     input:
@@ -306,7 +306,7 @@ rule gerp_clean:
     input:
        gerp_aggregate
     output:
-       temp('results/conservation/gerp.complete')
+       temp('results/tree/gerp.complete')
     conda:
       '../envs/phast.yaml'
     threads: 1
@@ -319,7 +319,7 @@ rule phylop_clean:
     input:
        phylop_aggregate
     output:
-       temp('results/conservation/phylop.complete')
+       temp('results/tree/phylop.complete')
     conda:
       '../envs/phast.yaml'
     threads: 1
