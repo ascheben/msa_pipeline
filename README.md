@@ -27,12 +27,8 @@ To test the pipeline before running on your own data, you can align some simulat
 ```
 cd msa_pipeline
 mkdir data
-# download test mammalian fasta files (3Mb total) to the data directory
-bash .test/mammals.sh ./data
-# align sequences to reference and carry out chaining and netting
-snakemake --use-conda -j 1 --configfile .test/mammals_config.yaml -R align
-# generate multiple alignment
-snakemake --use-conda -j 1 --configfile .test/mammals_config.yaml -R roast
+# download test mammalian fasta files (3Mb total) to the data directory and execute full pipeline
+bash .test/mammals.sh
 ```
 
 The main multiple sequence alignment result is written to `./results/roast/roast.maf` and all other intermediate files are written to the directories in `./results`.
@@ -40,8 +36,13 @@ The main multiple sequence alignment result is written to `./results/roast/roast
 A larger set of whole plant genomes can also be used to test the pipeline and the parallelization efficiency. Set the number of threads with the `-j` flag; using 12 threads should allow the pipeline to run in <1h.
 
 ```
-# download test Arabidopsis fasta files (700Mb total) to the data directory
-bash .test/arabidopsis.sh ./data
+# download test Arabidopsis fasta files (700Mb total) to the data directory and execute full pipeline
+bash .test/arabidopsis.sh
+```
+
+The three steps of the pipeline can be run individually with custom numbers of threads.
+
+```
 # split fasta files and align to reference, then carry out chaining and netting
 snakemake --use-conda -j 12 --configfile .test/arabidopsis_config.yaml -R align
 # generate multiple alignment
